@@ -34,7 +34,7 @@ def handle_audio(message):
         pred = model.predict(mfcc)
         speaker = labels[np.argmax(pred)]
 
-        bot.reply_to(message, f"🔊 Предсказанный говорящий: {speaker}")
+        bot.reply_to(message, f"🔊 говорящий: {speaker}")
 
     except Exception as e:
         bot.reply_to(message, f"❌ Ошибка: {e}")
