@@ -3,7 +3,6 @@ import numpy as np
 import librosa
 import subprocess
 from tensorflow.keras.models import load_model
-import threading
 
 # 🔐 Токен Telegram-бота
 TOKEN = "7424010381:AAF1_4x5XJpUj7V_d0KgmbZynggT7bJqxvg"
@@ -15,9 +14,17 @@ model = load_model("speaker_classifier.keras")
 # 🏷️ Классы
 labels = {0: "speaker1", 1: "speaker2", 2: "speaker3"}
 
-def process_audio(file_info, message):
+@bot.message_handler(content_types=['text'])
+def handle_text(message):
+    bot.reply_to(message, "👋 Привет! Пожалуйста, отправьте голосовое сообщение для идентификации говорящего.")
+
+@bot.message_handler(content_types=['voice'])
+def handle_voice(message):
     try:
+        file_info = bot.get_file(message.voice.file_id)
         downloaded_file = bot.download_file(file_info.file_path)
+
+        # Сохранение ogg-файла
         with open("input.ogg", 'wb') as f:
             f.write(downloaded_file)
 
@@ -34,23 +41,10 @@ def process_audio(file_info, message):
         pred = model.predict(mfcc)
         speaker = labels[np.argmax(pred)]
 
-        # Проверка уверенности модели (если менее 60% точности)
-        confidence = np.max(pred)
-        if confidence < 0.6:
-            bot.reply_to(message, "❌ Извините, я не смог распознать голос.")
-        else:
-            bot.reply_to(message, f"🔊 Говорящий: {speaker}")
+        bot.reply_to(message, f"🔊 Говорящий: {speaker}")
 
     except Exception as e:
         bot.reply_to(message, f"❌ Ошибка: {e}")
-
-@bot.message_handler(content_types=['voice'])
-def handle_voice(message):
-    file_info = bot.get_file(message.voice.file_id)
-
-    # Создаем новый поток для обработки файла
-    thread = threading.Thread(target=process_audio, args=(file_info, message))
-    thread.start()
 
 # Запуск
 bot.polling()
