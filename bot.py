@@ -1,8 +1,6 @@
-
 import telebot
 import numpy as np
 import librosa
-import subprocess
 from tensorflow.keras.models import load_model
 
 # 🔐 Токен Telegram-бота
@@ -15,20 +13,18 @@ model = load_model("speaker_classifier.keras")
 # 🏷️ Классы
 labels = {0: "speaker1", 1: "speaker2", 2: "speaker3"}
 
-@bot.message_handler(content_types=['voice'])
-def handle_voice(message):
+@bot.message_handler(content_types=['audio', 'document'])
+def handle_audio(message):
     try:
-        file_info = bot.get_file(message.voice.file_id)
+        # Получаем информацию о файле
+        file_info = bot.get_file(message.audio.file_id if message.audio else message.document.file_id)
         downloaded_file = bot.download_file(file_info.file_path)
 
-        # Сохранение ogg-файла
-        with open("input.ogg", 'wb') as f:
+        # Сохраняем как WAV
+        with open("input.wav", 'wb') as f:
             f.write(downloaded_file)
 
-        # Конвертация в wav
-        subprocess.call(['ffmpeg', '-y', '-i', 'input.ogg', 'input.wav'])
-
-        # Извлечение MFCC
+        # Извлекаем MFCC
         y, sr = librosa.load("input.wav", sr=16000)
         mfcc = librosa.feature.mfcc(y=y, sr=sr, n_mfcc=13).T
         mfcc = mfcc[:348] if mfcc.shape[0] > 348 else np.pad(mfcc, ((0, 348 - mfcc.shape[0]), (0, 0)))
@@ -43,5 +39,5 @@ def handle_voice(message):
     except Exception as e:
         bot.reply_to(message, f"❌ Ошибка: {e}")
 
-# Запуск
+# Запуск бота
 bot.polling()
