@@ -5,14 +5,14 @@ import subprocess
 import os
 from tensorflow.keras.models import load_model
 
-# 🔐 Токен Telegram-бота
+# Токен Telegram-бота
 TOKEN = "7424010381:AAF1_4x5XJpUj7V_d0KgmbZynggT7bJqxvg"  # 
 bot = telebot.TeleBot(TOKEN)
 
-# 🧠 Загрузка обученной модели
+# Загрузка обученной модели
 model = load_model("speaker_classifier.keras")
 
-# 🏷️ Словарь меток
+# Словарь меток
 labels = {0: "speaker1", 1: "speaker2", 2: "speaker3"}
 
 # 💬 Ответ на текстовые сообщения
@@ -52,10 +52,11 @@ def handle_audio(message):
 
         # Предсказание
         pred = model.predict(mfcc)
+        max_pred = np.max(pred)
         speaker = labels[np.argmax(pred)]
 
         # Проверка, если говорящий не в обученных классах
-        if np.max(pred) < 0.7:  
+        if max_pred < 0.7:  
             bot.reply_to(message, "❌ Извините, не удалось распознать говорящего.")
         else:
             bot.reply_to(message, f"🔊 Говорящий: {speaker}")
@@ -68,6 +69,5 @@ def handle_audio(message):
     except Exception as e:
         bot.reply_to(message, f"❌ Произошла ошибка: {e}")
 
-# ▶️ Запуск бота
+#  Запуск бота
 bot.polling()
-
