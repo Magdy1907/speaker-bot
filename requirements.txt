@@ -1,6 +1,6 @@
 pyTelegramBotAPI==4.10.0
 librosa==0.10.1
-tensorflow==2.10.0
+tensorflow==2.16.1
 soundfile
 numpy
 ffmpeg-python
