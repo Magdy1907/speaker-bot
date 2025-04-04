@@ -6,7 +6,7 @@ import os
 from tensorflow.keras.models import load_model
 
 # 🔐 Токен Telegram-бота
-TOKEN = "PUT_YOUR_TOKEN_HERE"  # ← замени на свой токен
+TOKEN = "7424010381:AAF1_4x5XJpUj7V_d0KgmbZynggT7bJqxvg" 
 bot = telebot.TeleBot(TOKEN)
 
 # 🧠 Загрузка обученной модели
