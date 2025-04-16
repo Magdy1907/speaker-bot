@@ -68,6 +68,7 @@ def handle_audio(message):
 
     except Exception as e:
         bot.reply_to(message, f"❌ Произошла ошибка: {e}")
-
+# Удаление активного webhook перед запуском polling
+bot.remove_webhook()
 #  Запуск бота
 bot.polling()
