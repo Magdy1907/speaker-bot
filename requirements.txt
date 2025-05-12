@@ -4,3 +4,4 @@ tensorflow==2.16.1
 soundfile
 numpy
 ffmpeg-python
+python-dotenv
