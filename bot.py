@@ -18,7 +18,8 @@ labels = {
     1: "Бабушка",
     2: "Влад",
     3: "Дедушка",
-    4: "Никита"
+    4: "Никита",
+    5: "Unknown"
 }
 
 # 💬 Ответ на текст
@@ -73,8 +74,8 @@ def handle_audio(message):
         confidence = np.max(pred)
         predicted = np.argmax(pred)
 
-        if confidence < 0.3:
-            bot.reply_to(message, "❌ Не удалось распознать голос.")
+        if predicted == 5:
+            bot.reply_to(message, "❌ Это неизвестный голос.")
         else:
             bot.reply_to(message, f"🗣️ Говорящий: {labels[predicted]}")
 
