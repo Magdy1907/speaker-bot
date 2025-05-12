@@ -5,7 +5,7 @@ import subprocess
 import os
 from tensorflow.keras.models import load_model
 
-# 🔐 Токен Telegram-бота
+# 🔐 Токен бота
 TOKEN = "7424010381:AAF1_4x5XJpUj7V_d0KgmbZynggT7bJqxvg"
 bot = telebot.TeleBot(TOKEN)
 
@@ -21,44 +21,43 @@ labels = {
     4: "Никита"
 }
 
-# 💬 Ответ на текстовые сообщения
+# 💬 Ответ на текст
 @bot.message_handler(content_types=['text'])
 def handle_text(message):
-    bot.reply_to(message, "👋 Привет! Отправь мне аудиофайл (WAV, OGG, MP3) или голосовое сообщение, и я скажу, кто говорит.")
+    bot.reply_to(message, "👋 Привет! Отправь голосовое сообщение или аудиофайл (WAV, MP3, OGG), и я скажу, кто говорит.")
 
-# 🎧 Обработка всех типов аудио (включая voice)
+# 🎧 Обработка аудио и voice
 @bot.message_handler(content_types=['audio', 'document', 'voice'])
 def handle_audio(message):
     try:
         # 📥 Получение файла
         if message.voice:
             file_info = bot.get_file(message.voice.file_id)
-            original_extension = ".ogg"
+            ext = ".ogg"
         elif message.audio:
             file_info = bot.get_file(message.audio.file_id)
-            original_extension = os.path.splitext(file_info.file_path)[1]
+            ext = os.path.splitext(file_info.file_path)[1]
         elif message.document:
             file_info = bot.get_file(message.document.file_id)
-            original_extension = os.path.splitext(file_info.file_path)[1]
+            ext = os.path.splitext(file_info.file_path)[1]
         else:
-            bot.reply_to(message, "⚠️ Тип файла не поддерживается.")
+            bot.reply_to(message, "⚠️ Неподдерживаемый формат файла.")
             return
 
-        downloaded_file = bot.download_file(file_info.file_path)
-        input_filename = f"input{original_extension}"
+        file_data = bot.download_file(file_info.file_path)
+        input_file = f"input{ext}"
+        with open(input_file, "wb") as f:
+            f.write(file_data)
 
-        with open(input_filename, 'wb') as f:
-            f.write(downloaded_file)
-
-        # 🎵 Конвертация в WAV
-        if original_extension.lower() != '.wav':
-            subprocess.call(['ffmpeg', '-y', '-i', input_filename, 'converted.wav'])
-            input_path = 'converted.wav'
+        # 🔄 Конвертация в WAV
+        wav_file = "converted.wav"
+        if ext.lower() != ".wav":
+            subprocess.run(['ffmpeg', '-y', '-i', input_file, wav_file], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         else:
-            input_path = input_filename
+            wav_file = input_file
 
         # 🧠 Извлечение MFCC
-        y, sr = librosa.load(input_path, sr=16000)
+        y, sr = librosa.load(wav_file, sr=16000)
         mfcc = librosa.feature.mfcc(y=y, sr=sr, n_mfcc=13).T
 
         max_len = model.input_shape[1]
@@ -71,22 +70,22 @@ def handle_audio(message):
 
         # 🤖 Предсказание
         pred = model.predict(mfcc)
-        max_prob = np.max(pred)
-        pred_class = np.argmax(pred)
+        confidence = np.max(pred)
+        predicted = np.argmax(pred)
 
-        if max_prob < 0.5:
+        if confidence < 0.7:
             bot.reply_to(message, "❌ Не удалось распознать голос.")
         else:
-            bot.reply_to(message, f"🗣️ Говорящий: {labels[pred_class]}")
+            bot.reply_to(message, f"🗣️ Говорящий: {labels[predicted]}")
 
         # 🧹 Очистка
-        os.remove(input_filename)
-        if os.path.exists("converted.wav"):
-            os.remove("converted.wav")
+        for f in [input_file, "converted.wav"]:
+            if os.path.exists(f):
+                os.remove(f)
 
     except Exception as e:
-        bot.reply_to(message, f"⚠️ Произошла ошибка: {e}")
+        bot.reply_to(message, f"⚠️ Ошибка: {e}")
 
-# 🚀 Старт бота
+# ▶️ Запуск бота
 bot.remove_webhook()
 bot.polling()
