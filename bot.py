@@ -5,8 +5,8 @@ import subprocess
 import os
 from tensorflow.keras.models import load_model
 
-# 🔐 Токен бота
-TOKEN = "7424010381:AAFhJOwnBKclkx4WVs6cG1btN_vnSK1tLVk"
+# 🔐 Загрузка токена из переменной среды
+TOKEN = os.getenv("BOT_TOKEN")
 bot = telebot.TeleBot(TOKEN)
 
 # 📦 Загрузка модели
