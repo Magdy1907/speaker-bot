@@ -30,7 +30,7 @@ def handle_text(message):
     )
 
 # 🎧 Обработка аудиофайлов
-@bot.message_handler(content_types=['audio', 'document'])
+@bot.message_handler(content_types=['audio', 'document', 'voice'])
 def handle_audio(message):
     try:
         # 📥 Получение файла
