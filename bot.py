@@ -73,7 +73,7 @@ def handle_audio(message):
         confidence = np.max(pred)
         predicted = np.argmax(pred)
 
-        if confidence < 0.7:
+        if confidence < 0.3:
             bot.reply_to(message, "❌ Не удалось распознать голос.")
         else:
             bot.reply_to(message, f"🗣️ Говорящий: {labels[predicted]}")
