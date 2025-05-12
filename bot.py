@@ -71,7 +71,8 @@ def handle_audio(message):
         if max_prob < 0.7:
             bot.reply_to(message, "❌ Не удалось распознать голос. Попробуй другой файл.")
         else:
-            bot.reply_to(message, f"🗣️ Говорящий: {labels[pred_class]} (достоверность: {max_prob:.2f})")
+           bot.reply_to(message, f"🗣️ Говорящий: {labels[pred_class]}")
+
 
         # 🧹 Удаление временных файлов
         os.remove(input_filename)
