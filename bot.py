@@ -6,7 +6,7 @@ import os
 from tensorflow.keras.models import load_model
 
 # 🔐 Токен бота
-TOKEN = "7424010381:AAF1_4x5XJpUj7V_d0KgmbZynggT7bJqxvg"
+TOKEN = "7424010381:AAFhJOwnBKclkx4WVs6cG1btN_vnSK1tLVk"
 bot = telebot.TeleBot(TOKEN)
 
 # 📦 Загрузка модели
