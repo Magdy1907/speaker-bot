@@ -74,7 +74,7 @@ def handle_audio(message):
         max_prob = np.max(pred)
         pred_class = np.argmax(pred)
 
-        if max_prob < 0.7:
+        if max_prob < 0.5:
             bot.reply_to(message, "❌ Не удалось распознать голос.")
         else:
             bot.reply_to(message, f"🗣️ Говорящий: {labels[pred_class]}")
