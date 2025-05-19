@@ -1,5 +1,5 @@
 # Используем базовый образ Python 3.9
-FROM python:3.9-slim
+FROM python:3.9
 
 # Устанавливаем зависимости для FFmpeg
 RUN apt-get update && apt-get install -y ffmpeg
